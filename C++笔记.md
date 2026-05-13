@@ -1,3 +1,14 @@
+#  define 常量和 const 常量的问题
+我在阅读《Cpp 那些事》的博客时发现一个问题，也就是开头的问题，define 常量和 const 常量的类型问题，文章原文指出 const 设定的变量是具有类型，而 define 定义的是没有类型的，被大佬指出 define 其实也是有类型的
+我经过 deepseek，stackoverflow，csdn 以及 Google c++这几个网站或者 AI，都表明原文作者说的是对的，
+Deepseek：`const` 有类型，可做类型检查；`#define` 宏本身没有数据类型，只是文本替换，不能进行类型安全检查。这是 C/C++ 教材中的标准结论。
+
+StackOverflow：Where should you not use macros? Anywhere you can use something else. Macros, like any `#define` are preprocessed, so the compiler does not see them at all. This means that there is never any symbols created for `HELLO_MAC` or `THROW_EXCEPT`, and so they cannot be seen in a debugger. They can also be confusing if you get compile errors, especially if they are long macros.(你应该如何不使用宏？任何可以使用其他东西的地方都不应该使用宏。宏，就像任何 `#define `一样，都是在预处理阶段处理的，所以编译器根本看不到它们。这意味着对于 HELLO_MAC 或 THROW_EXCEPT 永远不会创建任何符号，因此它们在调试器中也无法被看到。如果你遇到编译错误，它们也可能令人困惑，尤其是当它们很长时。)
+
+Google C++: 宏意味着你看到的代码与编译器看到的代码并不相同。这可能会导致一些意想不到的行为，尤其是在宏具有全局作用域的情况下。
+# Sizeof () 和 strlen () 区别
+说实话，这个东西是用来唬人的，学过 cpp 的基本上都知道这两个区别，一个是对于任意类型都能求出占用内存字节数，而另一个只能求字符串长度，且强制字符串以'\0'结尾，但是计数结果不包含‘\0’
+> 这种问题要是面试官问你，那你偷着乐吧
 # Const在函数前后的区别
 ```
 const Sales_data* ptr;  // 可以改变ptr指向，但不能通过ptr修改对象
@@ -261,37 +272,6 @@ int main()
 > 这里的 `void *` 指的是接受任意类型
 
 > 注意，realloc 无法重分配由 new 分配的内存空间，因为 `new` 和 `delete` 机制过于复杂，单纯的移动内存块会导致与C++对象生命周期管理不兼容，若要重分配，请将数组改成 `vector` 类型，而其余的方法不再过多介绍。
-
-# RAII(Resource Acquisition Is Initialization)资源获取即初始化
--  `RAII` 是 C++ 中的一种编程惯用法，通过对象的生命周期管理资源，确保资源在对象构造时获取，析构时释放，避免泄漏。
-## RAII 的最主要的实现: 智能指针
-### `std::shared_ptr`
-它是 C++ 标准库中功能强大的智能指针之一，提供了共享所有权的能力，使得多个指针可以共同管理同一个动态分配的对象。通过引用计数机制，`shared_ptr` 确保了对象在最后一个指针被销毁时自动释放，极大地简化了内存管理，防止了内存泄漏和悬挂指针问题。
-
-用法:
-```
-
-std::shared_ptr<A> ptrA;//声明
-std::shared_ptr<A> a = std::make_shared<A>();//利用std::make_shared进行创建
-```
-### `std::weak_ptr`
-它主要是用来解决 `std::shared_ptr` 在双向关联的情况下可能会循环引用导致的内存泄露的问题，它没有所有权机制。
-
-> 若要通过 `std::weak_ptr` 访问变量，请调用 `lock()` 进行提权，该函数会返回一个有效的 `std::shared_ptr` ，若 `std::shared_ptr` 被 `reset()` 释放，则返回空指针。
-
-用法:
-```
-std::weak_ptr<A> ptrA;//声明
-std::shared_ptr<A> a = std::make_shared<A>();//创建的方法和std::shared_ptr一模一样
-```
-### `std::unique_ptr`
-它是 C++ 标准库中功能强大的智能指针之一，提供了独享权的能力，该指针被禁用了拷贝，它只被允许移动。这样的特性保证了 `unique_ptr` 的独占权能力。
-用法:
-```
-std::unique_ptr<A> ptrA(new A());//cpp11标准下
-std::unique_ptr<A> ptrA=std::make_unique<A>();//cpp14标准及以上
-```
-
 # Lambda 表达式
 语法:
 ```
